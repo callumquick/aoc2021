@@ -15,8 +15,8 @@ fn part_one(input: &Vec<u32>) -> u32 {
 /// Find the product of the three numbers which sum to the target value.
 fn part_two(input: &Vec<u32>) -> u32 {
     let mut window_sums = Vec::new();
-    for ((num1, num2), num3) in input.iter().zip(&input[1..]).zip(&input[2..]) {
-        window_sums.push(num1 + num2 + num3);
+    for window in input.windows(3) {
+        window_sums.push(window.iter().sum());
     }
     part_one(&window_sums)
 }
