@@ -23,6 +23,14 @@ pub fn get_day_input(day: &'static str) -> String {
     fs::read_to_string(&input_file).expect(&format!("Could not read input file {}", &input_file))
 }
 
+/// Get a list of numbers from an input string.
+pub fn get_num_list(input: String) -> Vec<u32> {
+    input
+        .lines()
+        .map(|s| s.parse().expect("Failed to parse input"))
+        .collect()
+}
+
 /// Get a set of numbers from an input string.
 pub fn get_num_set(input: String) -> HashSet<u32> {
     input
