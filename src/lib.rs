@@ -4,6 +4,7 @@
 ///
 use std::collections::HashSet;
 use std::fs;
+use std::str::FromStr;
 use std::time::Instant;
 
 /// Time a closure in microseconds and print the results.
@@ -36,5 +37,18 @@ pub fn get_num_set(input: String) -> HashSet<u32> {
     input
         .lines()
         .map(|s| s.parse().expect("Failed to parse input"))
+        .collect()
+}
+
+/// Get a collection of parseables from an input string.
+pub fn parse_input_lines<C, T>(input: String) -> C
+where
+    C: FromIterator<T>,
+    T: FromStr,
+    <T as FromStr>::Err: std::fmt::Debug,
+{
+    input
+        .lines()
+        .map(|s| s.parse().expect("Line could not be parsed"))
         .collect()
 }

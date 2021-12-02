@@ -1,5 +1,5 @@
 /// Solution to Advent of Code Challenge Day 02.
-use aoc2021::{get_day_input, print_elapsed_time};
+use aoc2021::{get_day_input, parse_input_lines, print_elapsed_time};
 use std::io;
 use std::str::FromStr;
 
@@ -30,13 +30,6 @@ impl FromStr for Instruction {
             _ => panic!("Instruction name is not supported"),
         })
     }
-}
-
-fn parse_input(input: String) -> Vec<Instruction> {
-    input
-        .lines()
-        .map(|s| s.parse().expect("Invalid instruction line"))
-        .collect()
 }
 
 /// Find the horizontal and depth positions multiplied together
@@ -79,7 +72,7 @@ fn part_two(input: &Vec<Instruction>) -> u32 {
 
 fn main() {
     let input = get_day_input("02");
-    let instructions = parse_input(input);
+    let instructions = parse_input_lines(input);
     println!("Day 02:");
     println!("==========");
     println!(
