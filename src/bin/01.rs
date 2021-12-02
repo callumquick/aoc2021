@@ -1,5 +1,5 @@
 /// Solution to Advent of Code Challenge Day 01.
-use aoc2021::{get_day_input, get_num_list, print_elapsed_time};
+use aoc2021::{get_day_input, parse_input_lines, print_elapsed_time};
 
 /// Find the number of times the depth increases between measurements.
 fn part_one(input: &Vec<u32>) -> u32 {
@@ -23,7 +23,7 @@ fn part_two(input: &Vec<u32>) -> u32 {
 
 fn main() {
     let input = get_day_input("01");
-    let num_list = get_num_list(input);
+    let num_list = parse_input_lines(input);
     println!("Day 01:");
     println!("==========");
     println!("Part one: {}", print_elapsed_time(|| part_one(&num_list)));
