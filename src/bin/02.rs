@@ -99,7 +99,7 @@ down 8
 forward 2"
             .to_string();
 
-        let instructions = parse_input(input);
+        let instructions = parse_input_lines(input);
         // Check each gives the right answer.
         assert_eq!(part_one(&instructions), 150);
         assert_eq!(part_two(&instructions), 900);

@@ -48,7 +48,7 @@ mod tests {
 263"
         .to_string();
 
-        let num_list = get_num_list(input);
+        let num_list = parse_input_lines(input);
         // Check each gives the right answer.
         assert_eq!(part_one(&num_list), 7);
         assert_eq!(part_two(&num_list), 5);
