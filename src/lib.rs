@@ -1,8 +1,8 @@
-use std::fmt::Debug;
 /// Shared library functionality for the Advent of Code challenges.
 ///
 /// Public API should be accessible within compiled binaries.
 ///
+use std::fmt::Debug;
 use std::fs;
 use std::str::FromStr;
 use std::time::Instant;
