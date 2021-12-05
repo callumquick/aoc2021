@@ -104,7 +104,7 @@ fn part_two(input: &Vec<String>) -> u64 {
 
 fn main() {
     let input = get_day_input("03");
-    let inputs = parse_input_lines(input);
+    let inputs = parse_input_lines(&input);
     println!("Day 03:");
     println!("==========");
     println!("Part one: {}", print_elapsed_time(|| part_one(&inputs)));
@@ -131,7 +131,7 @@ mod tests {
 01010"
             .to_string();
 
-        let inputs = parse_input_lines(input);
+        let inputs = parse_input_lines(&input);
         // Check each gives the right answer.
         assert_eq!(part_one(&inputs), 198);
         assert_eq!(part_two(&inputs), 230);

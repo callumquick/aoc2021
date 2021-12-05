@@ -23,7 +23,7 @@ fn part_two(input: &Vec<u32>) -> u32 {
 
 fn main() {
     let input = get_day_input("01");
-    let num_list = parse_input_lines(input);
+    let num_list = parse_input_lines(&input);
     println!("Day 01:");
     println!("==========");
     println!("Part one: {}", print_elapsed_time(|| part_one(&num_list)));
@@ -48,7 +48,7 @@ mod tests {
 263"
         .to_string();
 
-        let num_list = parse_input_lines(input);
+        let num_list = parse_input_lines(&input);
         // Check each gives the right answer.
         assert_eq!(part_one(&num_list), 7);
         assert_eq!(part_two(&num_list), 5);
