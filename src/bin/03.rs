@@ -1,17 +1,5 @@
 /// Solution to Advent of Code Challenge Day 03.
 use aoc2021::{get_day_input, parse_input_lines, print_elapsed_time};
-use std::num::ParseIntError;
-use std::str::FromStr;
-
-#[derive(PartialEq)]
-struct FromBinary(u64);
-
-impl FromStr for FromBinary {
-    type Err = ParseIntError;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self(u64::from_str_radix(s, 2)?))
-    }
-}
 
 fn get_bit_sums(input: &Vec<String>) -> Vec<(u32, u32)> {
     let bit_num = input[0].len();
