@@ -99,15 +99,9 @@ fn calculate_overlaps(input: Vec<Line>) -> u64 {
         }
     }
 
-    let mut position_counts: Vec<Vec<u32>> = Vec::new();
-
-    for _ in 0..=x_max {
-        let mut ys = Vec::new();
-        for _ in 0..=y_max {
-            ys.push(0)
-        }
-        position_counts.push(ys)
-    }
+    let x_size: usize = x_max.try_into().unwrap();
+    let y_size: usize = y_max.try_into().unwrap();
+    let mut position_counts: Vec<Vec<u32>> = vec![vec![0; y_size + 1]; x_size + 1];
 
     for line in &input {
         for point in line.points() {
