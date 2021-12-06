@@ -21,7 +21,8 @@ where
 /// Get a string read from a file in the "input" folder.
 pub fn get_day_input(day: &'static str) -> String {
     let input_file = format!("input/{}.txt", day);
-    fs::read_to_string(&input_file).expect(&format!("Could not read input file {}", &input_file))
+    fs::read_to_string(&input_file)
+        .unwrap_or_else(|_| panic!("Could not read input file {}", &input_file))
 }
 
 /// Get a collection of parseables from an input string, separating it by a
@@ -34,7 +35,7 @@ where
     T: FromStr,
     <T as FromStr>::Err: Debug,
 {
-    with(&input)
+    with(input)
         .map(|s| s.parse().expect("Failed to parse input"))
         .collect()
 }
