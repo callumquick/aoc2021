@@ -81,9 +81,33 @@ impl Line {
 }
 
 fn calculate_overlaps(input: Vec<Line>) -> u64 {
-    // Assume that the coordinates are within (1000, 1000) and that overlaps are
-    // infrequent enough to be < 2^8
-    let mut position_counts = [[0u8; 1000]; 1000];
+    let mut x_max = 0;
+    let mut y_max = 0;
+
+    for line in &input {
+        if line.start.0 > x_max {
+            x_max = line.start.0;
+        }
+        if line.end.0 > x_max {
+            x_max = line.end.0;
+        }
+        if line.start.1 > y_max {
+            y_max = line.start.1;
+        }
+        if line.end.1 > y_max {
+            y_max = line.end.1;
+        }
+    }
+
+    let mut position_counts: Vec<Vec<u32>> = Vec::new();
+
+    for _ in 0..=x_max {
+        let mut ys = Vec::new();
+        for _ in 0..=y_max {
+            ys.push(0)
+        }
+        position_counts.push(ys)
+    }
 
     for line in &input {
         for point in line.points() {
