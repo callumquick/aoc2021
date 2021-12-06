@@ -1,6 +1,5 @@
 /// Solution to Advent of Code Challenge Day 05.
 use aoc2021::{get_day_input, parse_input_lines, parse_input_with, print_elapsed_time};
-use std::collections::HashMap;
 use std::num::ParseIntError;
 use std::str::FromStr;
 
@@ -81,32 +80,44 @@ impl Line {
     }
 }
 
-fn part_one(input: &Vec<Line>) -> u64 {
-    let mut counts = HashMap::new();
-    for line in input.iter().filter(|l| !l.diagonal()) {
+fn calculate_overlaps(input: Vec<Line>) -> u64 {
+    // Assume that the coordinates are within (1000, 1000) and that overlaps are
+    // infrequent enough to be < 2^8
+    let mut position_counts = [[0u8; 1000]; 1000];
+
+    for line in &input {
         for point in line.points() {
-            *counts.entry(point).or_insert(0) += 1;
+            let x: usize = point.0.try_into().unwrap();
+            let y: usize = point.1.try_into().unwrap();
+            position_counts[x][y] += 1;
         }
     }
 
-    counts
-        .iter()
-        .fold(0, |acc, (_, v)| if v > &1 { acc + 1 } else { acc })
+    let mut overlaps = 0;
+    for xs in position_counts {
+        for y in xs {
+            if y > 1 {
+                overlaps += 1;
+            }
+        }
+    }
+
+    overlaps
+}
+
+fn part_one(input: &Vec<Line>) -> u64 {
+    calculate_overlaps(
+        input
+            .iter()
+            .filter(|l| !l.diagonal())
+            .map(|l| l.to_owned())
+            .collect(),
+    )
 }
 
 fn part_two(input: &Vec<Line>) -> u64 {
-    let mut counts = HashMap::new();
-    for line in input {
-        for point in line.points() {
-            *counts.entry(point).or_insert(0) += 1;
-        }
-    }
-
-    counts
-        .iter()
-        .fold(0, |acc, (_, v)| if v > &1 { acc + 1 } else { acc })
+    calculate_overlaps(input.to_vec())
 }
-
 fn main() {
     let input = get_day_input("05");
     let inputs = parse_input_lines(&input);
