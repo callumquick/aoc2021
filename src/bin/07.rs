@@ -34,12 +34,13 @@ fn find_cost(input: &[u32], target: u32, triangle_cost: bool) -> u32 {
 fn part_one(input: &[u32]) -> u32 {
     // The sum of differences is minimised by the median: when as many positions
     // are below it as above it
-    let mut input = input.to_vec();
-    let middle = input.len() / 2;
-    input.sort_unstable();
-    let median = input[middle];
+    let mut sorted = input.to_vec();
+    sorted.sort_unstable();
 
-    find_cost(&input, median, false)
+    // Assume we're given odd-length inputs
+    let median = input[input.len() / 2];
+
+    find_cost(input, median, false)
 }
 
 fn part_two(input: &[u32]) -> u32 {
@@ -48,7 +49,7 @@ fn part_two(input: &[u32]) -> u32 {
     let floored_mean = input.iter().sum::<u32>() / input.len() as u32;
 
     (floored_mean..=(floored_mean + 1))
-        .map(|target| find_cost(&input, target, true))
+        .map(|target| find_cost(input, target, true))
         .min()
         .unwrap()
 }
