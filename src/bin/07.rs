@@ -18,34 +18,39 @@ fn cost_p2(target: u32, start: u32) -> u32 {
     (diff * (diff + 1)) / 2
 }
 
-/// Finds the minimum fuel cost using triangular cost or linear cost
-fn find_min_cost(input: &[u32], triangle_cost: bool) -> u32 {
-    let len: u32 = input.len().try_into().unwrap();
-    let total: u32 = input.iter().sum();
-    let avg: u32 = total / len;
-
-    let mut fuel_costs = Vec::new();
-    for target in (avg - (avg / 2))..=(avg + (avg / 2)) {
-        let mut sum = 0;
-        for curr in input {
-            if triangle_cost {
-                sum += cost_p2(target, *curr);
-            } else {
-                sum += cost_p1(target, *curr);
-            }
+/// Finds the fuel cost using triangular cost or linear cost
+fn find_cost(input: &[u32], target: u32, triangle_cost: bool) -> u32 {
+    let mut sum = 0;
+    for curr in input {
+        if triangle_cost {
+            sum += cost_p2(target, *curr);
+        } else {
+            sum += cost_p1(target, *curr);
         }
-        fuel_costs.push(sum);
     }
-
-    *fuel_costs.iter().min().unwrap()
+    sum
 }
 
 fn part_one(input: &[u32]) -> u32 {
-    find_min_cost(input, false)
+    // The sum of differences is minimised by the median: when as many positions
+    // are below it as above it
+    let mut input = input.to_vec();
+    let middle = input.len() / 2;
+    input.sort_unstable();
+    let median = input[middle];
+
+    find_cost(&input, median, false)
 }
 
 fn part_two(input: &[u32]) -> u32 {
-    find_min_cost(input, true)
+    // The sum of square differences is minimised by one of the whole numbers on
+    // either side of the mean: so get the lowest of the two costs
+    let floored_mean = input.iter().sum::<u32>() / input.len() as u32;
+
+    (floored_mean..=(floored_mean + 1))
+        .map(|target| find_cost(&input, target, true))
+        .min()
+        .unwrap()
 }
 
 fn main() {
