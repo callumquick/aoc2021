@@ -1,4 +1,4 @@
-/// Solution to Advent of Code Challenge Day 05.
+/// Solution to Advent of Code Challenge Day 06.
 use aoc2021::{get_day_input, parse_input_with, print_elapsed_time};
 
 fn calculate_population(starting: &[u32], cycles: u32) -> u64 {
