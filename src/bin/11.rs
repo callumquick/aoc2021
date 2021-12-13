@@ -80,7 +80,7 @@ fn octopus_iteration(octopi: &mut Vec<Row>) -> u64 {
     // processing queue is empty.
     while !processing.is_empty() {
         let octopus = processing.pop().unwrap();
-        for (i, j) in get_neighbours(&octopi, octopus.0, octopus.1) {
+        for (i, j) in get_neighbours(octopi, octopus.0, octopus.1) {
             octopi[j].0[i] += 1;
             // If this has enough energy to flash but that flash hasn't
             // already been processed, add it to the processing queue.
