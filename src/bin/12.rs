@@ -1,52 +1,57 @@
 /// Solution to Advent of Code Challenge Day 12.
-use aoc2021::{get_day_input, parse_input_lines, parse_input_with, print_elapsed_time};
-use std::collections::hash_map::DefaultHasher;
+use aoc2021::{get_day_input, parse_input_lines, print_elapsed_time};
 use std::collections::{HashMap, HashSet};
-use std::hash::{Hash, Hasher};
 use std::io;
 use std::str::FromStr;
 
 const DAY: &str = "12";
 
-#[derive(Debug, Clone, PartialEq, Hash, Eq)]
-struct Cave {
-    name: CaveHash,
-    big: bool,
-}
-
-type CaveHash = u64;
+type CaveHash = u16;
 
 fn hash_name(s: &str) -> CaveHash {
-    let mut h = DefaultHasher::new();
-    s.hash(&mut h);
-    h.finish()
-}
-
-impl FromStr for Cave {
-    type Err = io::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self {
-            name: hash_name(s),
-            big: s.to_uppercase() == s,
-        })
+    match s {
+        "start" => 0,
+        "end" => u16::MAX,
+        // Make up a hash, which also gives whether it is
+        // uppercase or not.
+        name => {
+            let hash: u16 = name
+                .chars()
+                .enumerate()
+                .map(|(i, c)| 128u16.pow(i as u32) * (c as u16))
+                .sum();
+            if name == name.to_uppercase() {
+                hash * 2 + 1
+            } else {
+                hash * 2
+            }
+        }
     }
 }
 
-type Path = Vec<Cave>;
+fn is_small(h: CaveHash) -> bool {
+    match h {
+        0 => true,
+        u16::MAX => true,
+        n => (n % 2) != 1,
+    }
+}
+
+type Path = Vec<CaveHash>;
 
 #[derive(Debug, Clone, PartialEq)]
 struct Entry {
-    from: Cave,
-    to: Cave,
+    from: CaveHash,
+    to: CaveHash,
 }
 
 impl FromStr for Entry {
     type Err = io::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let parsed: Vec<Cave> = parse_input_with(s, |s| s.split('-'));
+        let parsed: Vec<CaveHash> = s.split('-').map(|s| hash_name(s)).collect();
         Ok(Self {
-            from: parsed[0].to_owned(),
-            to: parsed[1].to_owned(),
+            from: parsed[0],
+            to: parsed[1],
         })
     }
 }
@@ -54,32 +59,32 @@ impl FromStr for Entry {
 /// Recursive function that builds up every path from a given current path to the end.
 fn find_paths(
     paths: &mut HashSet<Path>,
-    leads_to: &HashMap<&Cave, HashSet<&Cave>>,
-    small_visited: &HashSet<Cave>,
+    leads_to: &HashMap<&CaveHash, HashSet<&CaveHash>>,
+    small_visited: &HashSet<CaveHash>,
     path: Path,
-    extra_small_visit: Option<Cave>,
+    extra_small_visit: Option<CaveHash>,
     allow_small_visits: bool,
 ) {
-    let start: Cave = "start".parse().unwrap();
-    let end: Cave = "end".parse().unwrap();
+    let start: CaveHash = hash_name("start");
+    let end: CaveHash = hash_name("end");
 
     // Every cave leads to somewhere (even if it's back where you came from).
     for cave in leads_to.get(path.last().unwrap()).unwrap() {
         let mut new_path: Path = path.clone();
-        new_path.push((*cave).to_owned());
+        new_path.push(**cave);
 
         if **cave == end {
             paths.insert(new_path.clone());
             continue;
         } else if **cave == start {
             continue;
-        } else if !cave.big {
+        } else if is_small(**cave) {
             let mut allow_visit = false;
-            let mut new_extra_small_visit = extra_small_visit.clone();
+            let mut new_extra_small_visit = extra_small_visit;
 
             if small_visited.contains(cave) {
                 if allow_small_visits && extra_small_visit.is_none() {
-                    new_extra_small_visit = Some((*cave).to_owned());
+                    new_extra_small_visit = Some(**cave);
                     allow_visit = true;
                 }
             } else {
@@ -92,7 +97,7 @@ fn find_paths(
                 // that for further recursion, otherwise can save ourselves time
                 // and just use the existing info.
                 let mut new_small_visited = small_visited.clone();
-                new_small_visited.insert((*cave).to_owned());
+                new_small_visited.insert(**cave);
                 find_paths(
                     paths,
                     leads_to,
@@ -108,7 +113,7 @@ fn find_paths(
                 leads_to,
                 small_visited,
                 new_path,
-                extra_small_visit.clone(),
+                extra_small_visit,
                 allow_small_visits,
             );
         }
@@ -124,10 +129,10 @@ fn part_one(input: &[Entry]) -> u64 {
         leads_to.entry(&entry.to).or_default().insert(&entry.from);
     }
 
-    let start: Cave = "start".parse().unwrap();
+    let start: CaveHash = hash_name("start");
 
     let mut paths = HashSet::new();
-    let path: Path = vec![start.to_owned()];
+    let path: Path = vec![start];
     let mut small_visited = HashSet::new();
     small_visited.insert(start);
     find_paths(&mut paths, &leads_to, &small_visited, path, None, false);
@@ -143,10 +148,10 @@ fn part_two(input: &[Entry]) -> u64 {
         leads_to.entry(&entry.to).or_default().insert(&entry.from);
     }
 
-    let start: Cave = "start".parse().unwrap();
+    let start: CaveHash = hash_name("start");
 
     let mut paths = HashSet::new();
-    let path: Path = vec![start.to_owned()];
+    let path: Path = vec![start];
     let mut small_visited = HashSet::new();
     small_visited.insert(start);
     find_paths(&mut paths, &leads_to, &small_visited, path, None, true);
