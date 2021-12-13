@@ -1,6 +1,8 @@
 /// Solution to Advent of Code Challenge Day 12.
 use aoc2021::{get_day_input, parse_input_lines, parse_input_with, print_elapsed_time};
+use std::collections::hash_map::DefaultHasher;
 use std::collections::{HashMap, HashSet};
+use std::hash::{Hash, Hasher};
 use std::io;
 use std::str::FromStr;
 
@@ -8,15 +10,23 @@ const DAY: &str = "12";
 
 #[derive(Debug, Clone, PartialEq, Hash, Eq)]
 struct Cave {
-    name: String,
+    name: CaveHash,
     big: bool,
+}
+
+type CaveHash = u64;
+
+fn hash_name(s: &str) -> CaveHash {
+    let mut h = DefaultHasher::new();
+    s.hash(&mut h);
+    h.finish()
 }
 
 impl FromStr for Cave {
     type Err = io::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self {
-            name: s.to_owned(),
+            name: hash_name(s),
             big: s.to_uppercase() == s,
         })
     }
@@ -44,20 +54,14 @@ impl FromStr for Entry {
 /// Recursive function that builds up every path from a given current path to the end.
 fn find_paths(
     paths: &mut HashSet<Path>,
-    leads_to: &HashMap<&Cave, Vec<&Cave>>,
+    leads_to: &HashMap<&Cave, HashSet<&Cave>>,
     small_visited: &HashSet<Cave>,
     path: Path,
     extra_small_visit: Option<Cave>,
     allow_small_visits: bool,
 ) {
-    let start: Cave = Cave {
-        name: String::from("start"),
-        big: false,
-    };
-    let end: Cave = Cave {
-        name: String::from("end"),
-        big: false,
-    };
+    let start: Cave = "start".parse().unwrap();
+    let end: Cave = "end".parse().unwrap();
 
     // Every cave leads to somewhere (even if it's back where you came from).
     for cave in leads_to.get(path.last().unwrap()).unwrap() {
@@ -112,18 +116,15 @@ fn find_paths(
 }
 
 fn part_one(input: &[Entry]) -> u64 {
-    let mut leads_to: HashMap<_, Vec<_>> = HashMap::new();
+    let mut leads_to: HashMap<_, HashSet<_>> = HashMap::new();
     for entry in input {
         // Each entry allows access both forwards and backwards, except start
         // and end.
-        leads_to.entry(&entry.from).or_default().push(&entry.to);
-        leads_to.entry(&entry.to).or_default().push(&entry.from);
+        leads_to.entry(&entry.from).or_default().insert(&entry.to);
+        leads_to.entry(&entry.to).or_default().insert(&entry.from);
     }
 
-    let start: Cave = Cave {
-        name: String::from("start"),
-        big: false,
-    };
+    let start: Cave = "start".parse().unwrap();
 
     let mut paths = HashSet::new();
     let path: Path = vec![start.to_owned()];
@@ -135,17 +136,14 @@ fn part_one(input: &[Entry]) -> u64 {
 }
 
 fn part_two(input: &[Entry]) -> u64 {
-    let mut leads_to: HashMap<_, Vec<_>> = HashMap::new();
+    let mut leads_to: HashMap<_, HashSet<_>> = HashMap::new();
     for entry in input {
         // Each entry allows access both forwards and backwards.
-        leads_to.entry(&entry.from).or_default().push(&entry.to);
-        leads_to.entry(&entry.to).or_default().push(&entry.from);
+        leads_to.entry(&entry.from).or_default().insert(&entry.to);
+        leads_to.entry(&entry.to).or_default().insert(&entry.from);
     }
 
-    let start: Cave = Cave {
-        name: String::from("start"),
-        big: false,
-    };
+    let start: Cave = "start".parse().unwrap();
 
     let mut paths = HashSet::new();
     let path: Path = vec![start.to_owned()];
