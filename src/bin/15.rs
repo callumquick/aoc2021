@@ -1,6 +1,7 @@
 /// Solution to Advent of Code Challenge Day 15.
 use aoc2021::{get_day_input, parse_input_lines, print_elapsed_time};
-use std::collections::{HashMap, VecDeque};
+use std::cmp::Reverse;
+use std::collections::{BinaryHeap, HashMap};
 use std::io;
 use std::str::FromStr;
 
@@ -69,28 +70,27 @@ fn reconstruct_cost(
     cost
 }
 
-/// Use the Manhattan distance as the A* heuristic as only allowed to move in 4
-/// directions, and the cost is always greater than or equal to 1 for each hop,
-/// so this will always give less than the optimal route.
-fn heuristic(node: Coord, goal: Coord) -> Cost {
-    ((goal.0 - node.0) + (goal.1 - node.1)) as Cost
+/// Use 0 heuristic, effectively turning A* into Dijkstra's, as this appears to
+/// be quicker for some reason for this type of input.
+fn heuristic(_node: Coord, _goal: Coord) -> Cost {
+    0
 }
 
 /// Implement the A* pathfinding algorithm.
 fn find_best_cost_astar(grid: &[Row], start: Coord, end: Coord) -> Cost {
-    let mut open = VecDeque::new();
+    let mut open = BinaryHeap::new();
     let mut best_parent = HashMap::new();
     let mut best_cost = HashMap::new();
     let mut weighted_cost = HashMap::new();
 
     let worst_cost = (end.0 * end.1 * 9) as Cost;
 
-    open.push_back(start);
+    open.push(Reverse(start));
     best_cost.insert(start, 0_u64);
     weighted_cost.insert(start, heuristic(start, end));
 
     while !open.is_empty() {
-        let current = open.pop_front().unwrap();
+        let current = open.pop().unwrap().0;
         if current == end {
             return reconstruct_cost(grid, best_parent, current, start);
         }
@@ -105,18 +105,9 @@ fn find_best_cost_astar(grid: &[Row], start: Coord, end: Coord) -> Cost {
                 let new_weighted = new_cost + heuristic(neighbour, end);
                 weighted_cost.insert(neighbour, new_weighted);
 
-                // Maintain open as a priority queue: lowest weighted cost
-                // nodes are at the start for pop_front().
-                if !open.contains(&neighbour) {
-                    let mut idx = 0;
-                    for (i, node) in open.iter().enumerate() {
-                        idx = i;
-                        if *weighted_cost.get(node).unwrap() > new_weighted {
-                            break;
-                        }
-                    }
-                    open.insert(idx, neighbour);
-                }
+                // Maintain open as a min heap: wrap each value in Reverse turns
+                // BinaryHeap from a max to a min heap.
+                open.push(Reverse(neighbour));
             }
         }
     }
