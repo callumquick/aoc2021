@@ -3,7 +3,7 @@ name = "aoc2021"
 version = "0.1.0"
 authors = ["Callum Ward <wards.callum@gmail.com>"]
 edition = "2021"
-default-run="16"
+default-run="17"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
